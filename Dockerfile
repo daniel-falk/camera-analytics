@@ -38,6 +38,12 @@ RUN make
 WORKDIR /src/micropython/ports/unix
 RUN make submodules
 
+# Link the c-modules to build with micropython
+COPY submodules/ /submodules
+RUN mkdir /c_modules/
+RUN ln -s /submodules/micropython-ulab/code /c_modules/ulab
+ENV USER_C_MODULES=/c_modules/
+
 # Build micropython for host, for testing purpose
 RUN make
 RUN cp micropython /usr/bin/
