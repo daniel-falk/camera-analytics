@@ -1,3 +1,6 @@
 [submodule "submodules/micropython-ulab"]
 	path = submodules/micropython-ulab
 	url = https://github.com/v923z/micropython-ulab
+[submodule "submodules/ujpeg"]
+	path = submodules/ujpeg
+	url = https://github.com/daniel-falk/ujpeg

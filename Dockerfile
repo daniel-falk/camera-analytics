@@ -31,6 +31,13 @@ RUN $CXX --version
 RUN apt install libffi-dev:armhf -y
 RUN apt install libffi-dev -y
 
+# ujpeg library needs libjpeg installed
+RUN apt-get install libjpeg-dev:armhf -y
+RUN apt-get install libjpeg-dev -y
+
+# Copy tools scripts
+COPY tools/ /tools
+
 WORKDIR /src
 RUN git clone https://github.com/micropython/micropython.git
 WORKDIR /src/micropython/mpy-cross
@@ -40,9 +47,9 @@ RUN make submodules
 
 # Link the c-modules to build with micropython
 COPY submodules/ /submodules
-RUN mkdir /c_modules/
-RUN ln -s /submodules/micropython-ulab/code /c_modules/ulab
 ENV USER_C_MODULES=/c_modules/
+RUN /tools/add-c-module.sh $USER_C_MODULES /submodules/micropython-ulab/code ULAB
+RUN /tools/add-c-module.sh $USER_C_MODULES /submodules/ujpeg/src UJPEG
 
 # Build micropython for host, for testing purpose
 RUN make
