@@ -12,7 +12,7 @@ class Annotator(DebugViewer):
     def __init__(self, img_dir, index_path):
         super().__init__()
 
-        self.image_paths = list(Path(img_dir).glob("*"))
+        self.image_paths = list(self.get_images(Path(img_dir)))
         self.index_path = index_path
         self.open_index()
 
@@ -21,6 +21,13 @@ class Annotator(DebugViewer):
         self.current_idx = 0
         self._len = None
         self.left_to_annotate = self._calc_not_annotated()
+
+    def get_images(self, img_dir):
+        def img_path_filter(img_path):
+            if img_path.is_dir():
+                return False
+            return True
+        return filter(img_path_filter, img_dir.glob("*"))
 
     def open_index(self):
         self.db = {}
