@@ -1,20 +1,27 @@
 import click
-import json
 import cv2
-import os
 from pathlib import Path
 from vi3o.image import imread
 from vi3o.debugview import DebugViewer
 from pyglet.window import key as keysym
 
+from camlytics.annotation.data_file import DictDataFile
+
 
 class Annotator(DebugViewer):
+    """This class is a graphical window to annotate images
+
+    Images are annotated with up/down keys to select between two states
+    "open" and "closed". The data is saved to a index file. Only images
+    that does not exist in the index file are viewed for annotation.
+
+    Left, right keys and ENTER is used to navigate among the images.
+    """
     def __init__(self, img_dir, index_path):
         super().__init__()
 
         self.image_paths = list(self.get_images(Path(img_dir)))
-        self.index_path = index_path
-        self.open_index()
+        self.db = DictDataFile(index_path)
 
         self.exit = False
         self.next_idx = None
@@ -28,17 +35,6 @@ class Annotator(DebugViewer):
                 return False
             return True
         return filter(img_path_filter, img_dir.glob("*"))
-
-    def open_index(self):
-        self.db = {}
-        try:
-            with open(self.index_path) as fd:
-                self.db = json.load(fd)
-        except FileNotFoundError:
-            pass
-        except json.decoder.JSONDecodeError:
-            if os.stat(self.index_path).st_size != 0:
-                raise
 
     def annotate(self):
         for img_path in self.next():
@@ -56,6 +52,9 @@ class Annotator(DebugViewer):
             self.view(img, pause=True)
             print("Not annotated images: %d/%d" % (self.left_to_annotate, len(self)))
 
+    def write_to_file(self):
+        self.db.commit()
+
     def next(self):
         while not self.exit:
             if self.next_idx is not None:
@@ -71,10 +70,6 @@ class Annotator(DebugViewer):
                         break
 
             yield self._get_path()
-
-    def write_to_file(self):
-        with open(self.index_path, "w") as fd:
-            json.dump(self.db, fd, indent=2, sort_keys=True)
 
     def _set_state(self, new_state):
         if self._get_path() not in self.db:
