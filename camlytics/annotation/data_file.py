@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+import numpy as np
 
 
 class DictDataFile:
@@ -33,6 +34,9 @@ class DictDataFile:
     def __iter__(self):
         return iter(self.db)
 
+    def __getitem__(self, name):
+        return self.db[name]
+
     def __setitem__(self, name, value):
         self.db[name] = value
 
@@ -45,3 +49,24 @@ class DictDataFile:
             return dict.__setattr__(self, name, value)
         else:
             return setattr(self.db, name, value)
+
+
+def image_data_bunch_from_data_file(index_path, seed=0, **kwargs):
+    """This factory creates a fastai ImageDataBunch from an index
+    """
+    from fastai.vision.data import ImageDataBunch
+
+    db = DictDataFile(index_path)
+
+    def label_from_key(fpath):
+        return db[fpath]
+
+    # Set the numpy seed to we get deterministic splits of traing/validation data
+    # then reset it to the previous value so we don't affect the rest of the application
+    old_state = np.random.get_state()
+    try:
+        if seed is not None:
+            np.random.seed(seed)
+        return ImageDataBunch.from_name_func(fnames=db.keys(), label_func=label_from_key, **kwargs)
+    finally:
+        np.random.set_state(old_state)
