@@ -67,7 +67,7 @@ class Annotator(DebugViewer):
 
     def write_to_file(self):
         with open(self.index_path, "w") as fd:
-            json.dump(self.db, fd)
+            json.dump(self.db, fd, indent=2, sort_keys=True)
 
     def _set_state(self, new_state):
         if self._get_path() not in self.db:
