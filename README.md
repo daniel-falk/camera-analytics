@@ -1,3 +1,5 @@
+# Edge based camera image analytics
+
 Application for ARMv7 based network camera for door state prediction (door open / door closed) using a conv net.
 
 Idea of project is to create an easy to train installation dependent detector to see if a door is open or closed. Training is done on host (a developer machine) while the prediction is done on edge (in the network camera).
@@ -5,6 +7,28 @@ Idea of project is to create an easy to train installation dependent detector to
 Applications for host written in python3.7+, applications for camera written in micropython with c-modules for acceleration where needed. Training of neural network is done in pytorch, inference (on edge) shall be done using ulab (numpy-like library for micropython) or a c-module.
 
 A dockerfile for building an SDK or dev env to build c-modules for micropython is included, this handles all cross-compiling for ARMv7.
+
+## Development
+
+### Building micropython c modules
+The c modules are built in the second stage of the multi stage docker build. If this does not work, e.g. when developing the c modules one can build a "base" sdk where micropython and c modules are not yet compiled. One can then start a container and mount the submodule code from host.
+```bash
+docker build . --target=base -t camera-analytics:base
+docker run --rm -it -v `pwd`/submodules/:/submodules camera-analytics:base
+export USER_C_MODULES=/c_modules/
+/tools/add-c-module.sh $USER_C_MODULES /submodules/micropython-ulab/code ULAB
+/tools/add-c-module.sh $USER_C_MODULES /submodules/ujpeg/src UJPEG
+make
+```
+This mounts the "live version" of the source code and allows for fast iteration if the make command fails, simply fix the code and rerun make.
+
+### Using valgrind to find memory leaks
+The image can be build with valgrind installed which can be used to find memory leaks in e.g. the c modules:
+```bash
+docker build . --build-arg=BASE=base-valgrind -t camera-analytics:base-valgrind
+docker run --rm -it camera-analytics:base-valgrind
+valgrind --tool=memcheck --leak-check=full /usr/bin/micropython /submodules/ujpeg/test.py
+```
 
 # TODO:
 

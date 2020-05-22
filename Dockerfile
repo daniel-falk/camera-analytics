@@ -1,4 +1,9 @@
-FROM ubuntu:bionic-20200219
+ARG BASE=base
+
+
+# The "base" image contains all common libraries, headers and tools needed
+# as well as the micropython source code, it is however not compiled.
+FROM ubuntu:bionic-20200219 as base
 
 # Add foreign architecture so we can apt-get install packages for target
 RUN dpkg --add-architecture armhf
@@ -44,6 +49,18 @@ WORKDIR /src/micropython/mpy-cross
 RUN make
 WORKDIR /src/micropython/ports/unix
 RUN make submodules
+
+
+# The "base-valgrind" is same as the base image but also has valgind installed
+FROM base as base-valgrind
+
+RUN apt-get install -y valgrind
+
+
+
+# The "sdk" image contains a copy of the submodules and symlinked micropython
+# c modules as well as compiled binaries.
+FROM ${BASE} as sdk
 
 # Link the c-modules to build with micropython
 COPY submodules/ /submodules
