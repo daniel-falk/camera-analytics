@@ -4,3 +4,6 @@
 [submodule "submodules/ujpeg"]
 	path = submodules/ujpeg
 	url = https://github.com/daniel-falk/ujpeg
+[submodule "submodules/micropython-lib"]
+	path = submodules/micropython-lib
+	url = https://github.com/micropython/micropython-lib.git

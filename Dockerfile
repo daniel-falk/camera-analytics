@@ -50,6 +50,10 @@ RUN make
 WORKDIR /src/micropython/ports/unix
 RUN make submodules
 
+# Copy the standard micropython libs to image
+COPY submodules/micropython-lib /tmp/micropython-lib
+RUN cd /tmp/micropython-lib && make install PREFIX=/usr/lib/micropython
+RUN rm -rf /tmp/micropython-lib
 
 # The "base-valgrind" is same as the base image but also has valgind installed
 FROM base as base-valgrind
