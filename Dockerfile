@@ -43,6 +43,8 @@ RUN apt-get install libjpeg-dev -y
 # Copy tools scripts
 COPY tools/ /tools
 
+# Clone micropython source and build the cross-compiler tools
+# but don't build micropython itself yet..
 WORKDIR /src
 RUN git clone https://github.com/micropython/micropython.git
 WORKDIR /src/micropython/mpy-cross
@@ -55,6 +57,14 @@ COPY submodules/micropython-lib /tmp/micropython-lib
 RUN cd /tmp/micropython-lib && make install PREFIX=/usr/lib/micropython
 RUN rm -rf /tmp/micropython-lib
 
+# Link the c-modules to build with micropython
+# In the base containers, these links are poining to an non
+# existing dir which can be mounted when container is used.
+# In the SDK the submodules are copied in place in a later step.
+ENV USER_C_MODULES=/c_modules/
+RUN /tools/add-c-module.sh $USER_C_MODULES /submodules/micropython-ulab/code ULAB
+RUN /tools/add-c-module.sh $USER_C_MODULES /submodules/ujpeg/src UJPEG
+
 # The "base-valgrind" is same as the base image but also has valgind installed
 FROM base as base-valgrind
 
@@ -66,11 +76,8 @@ RUN apt-get install -y valgrind
 # c modules as well as compiled binaries.
 FROM ${BASE} as sdk
 
-# Link the c-modules to build with micropython
+# Copy all code in the submodules
 COPY submodules/ /submodules
-ENV USER_C_MODULES=/c_modules/
-RUN /tools/add-c-module.sh $USER_C_MODULES /submodules/micropython-ulab/code ULAB
-RUN /tools/add-c-module.sh $USER_C_MODULES /submodules/ujpeg/src UJPEG
 
 # Build micropython for host, for testing purpose
 RUN make

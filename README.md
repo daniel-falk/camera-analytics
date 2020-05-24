@@ -15,9 +15,6 @@ The c modules are built in the second stage of the multi stage docker build. If 
 ```bash
 docker build . --target=base -t camera-analytics:base
 docker run --rm -it -v `pwd`/submodules/:/submodules camera-analytics:base
-export USER_C_MODULES=/c_modules/
-/tools/add-c-module.sh $USER_C_MODULES /submodules/micropython-ulab/code ULAB
-/tools/add-c-module.sh $USER_C_MODULES /submodules/ujpeg/src UJPEG
 make
 ```
 This mounts the "live version" of the source code and allows for fast iteration if the make command fails, simply fix the code and rerun make.
