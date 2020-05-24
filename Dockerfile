@@ -23,6 +23,7 @@ RUN apt-get install autoconf -y
 RUN apt-get install libtool -y
 RUN apt-get install pkg-config -y
 RUN apt-get install python3 -y
+RUN apt-get install valgrind -y
 
 # Install the cross-compiler toolchain
 RUN apt-get install gcc-arm-linux-gnueabihf -y
@@ -64,12 +65,6 @@ RUN rm -rf /tmp/micropython-lib
 ENV USER_C_MODULES=/c_modules/
 RUN /tools/add-c-module.sh $USER_C_MODULES /submodules/micropython-ulab/code ULAB
 RUN /tools/add-c-module.sh $USER_C_MODULES /submodules/ujpeg/src UJPEG
-
-# The "base-valgrind" is same as the base image but also has valgind installed
-FROM base as base-valgrind
-
-RUN apt-get install -y valgrind
-
 
 
 # The "sdk" image contains a copy of the submodules and symlinked micropython

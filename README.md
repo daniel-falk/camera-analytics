@@ -11,7 +11,7 @@ A dockerfile for building an SDK or dev env to build c-modules for micropython i
 ## Development
 
 ### Building micropython c modules
-The c modules are built in the second stage of the multi stage docker build. If this does not work, e.g. when developing the c modules one can build a "base" sdk where micropython and c modules are not yet compiled. One can then start a container and mount the submodule code from host.
+The c modules are built in the second stage of the multi stage docker build. If this does not work, e.g. when developing the c modules one can build a "base" image where micropython and c modules are not yet compiled. One can then start a container and mount the submodule code from host.
 ```bash
 docker build . --target=base -t camera-analytics:base
 docker run --rm -it -v `pwd`/submodules/:/submodules camera-analytics:base
@@ -20,10 +20,10 @@ make
 This mounts the "live version" of the source code and allows for fast iteration if the make command fails, simply fix the code and rerun make.
 
 ### Using valgrind to find memory leaks
-The image can be build with valgrind installed which can be used to find memory leaks in e.g. the c modules:
+The SDK and base image includes valgrind which can be used to find memory leaks in e.g. the c modules:
 ```bash
-docker build . --build-arg=BASE=base-valgrind -t camera-analytics:base-valgrind
-docker run --rm -it camera-analytics:base-valgrind
+make build-sdk
+docker run --rm -it camera-analytics:latest
 valgrind --tool=memcheck --leak-check=full /usr/bin/micropython /submodules/ujpeg/test.py
 ```
 
