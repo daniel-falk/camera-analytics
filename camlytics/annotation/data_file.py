@@ -67,6 +67,6 @@ def image_data_bunch_from_data_file(index_path, seed=0, **kwargs):
     try:
         if seed is not None:
             np.random.seed(seed)
-        return ImageDataBunch.from_name_func(fnames=db.keys(), label_func=label_from_key, **kwargs)
+        return ImageDataBunch.from_name_func(fnames=list(db.keys()), label_func=label_from_key, **kwargs)
     finally:
         np.random.set_state(old_state)
