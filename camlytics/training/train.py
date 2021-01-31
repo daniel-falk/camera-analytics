@@ -67,21 +67,27 @@ class DataSet:
 
 
 class MultiDataSet(DataSet):
-    def __init__(self, db, balanced=True, train=0.8, validate=0.1):
+    def __init__(self, db, balanced=True, train=0.8, validate=0.1, seed=0):
         super().__init__(db.copy())
 
 
-        if balanced:
-            num_min = min(self.num_open, self.num_closed)
-            num_train = int(num_min * train)
-            num_validate = int(num_min * validate)
-            train_db = self._pop_balanced(num_train)
-            validate_db = self._pop_balanced(num_validate)
-        else:
-            num_train = int(len(self.db) * train)
-            num_validate = int(len(self.db) * validate)
-            train_db = self._pop(num_train)
-            validate_db = self._pop(num_validate)
+        old_state = np.random.get_state()
+        try:
+            if seed is not None:
+                np.random.seed(seed)
+            if balanced:
+                num_min = min(self.num_open, self.num_closed)
+                num_train = int(num_min * train)
+                num_validate = int(num_min * validate)
+                train_db = self._pop_balanced(num_train)
+                validate_db = self._pop_balanced(num_validate)
+            else:
+                num_train = int(len(self.db) * train)
+                num_validate = int(len(self.db) * validate)
+                train_db = self._pop(num_train)
+                validate_db = self._pop(num_validate)
+        finally:
+            np.random.set_state(old_state)
 
         self.train, self.validate, self.test = (DataSet(db) for db in (train_db, validate_db, self.db))
 
@@ -90,7 +96,7 @@ class MultiDataSet(DataSet):
             return {}
         num = len(self.db)
         idx = np.random.choice(range(num), amount, replace=False)
-        keys = self.db.keys()[idx]
+        keys = np.array(list(self.db.keys()))[idx]
         new_db = {key: self.db.pop(key) for key in keys}
         return new_db
 
@@ -120,7 +126,7 @@ def do_train(index_path, input_width, input_height):
     with open(index_path) as fd:
         db = json.load(fd)
 
-    data = MultiDataSet(db, validate=0)
+    data = MultiDataSet(db, balanced=False, train=0.9)
 
     tab = PrettyTable(["Dataset name", "Num open", "Num closed"])
     for name in ("train", "validate", "test"):

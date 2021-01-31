@@ -32,7 +32,7 @@ def train(data):
 @click.option("--width", default=192)
 @click.option("--height", default=108)
 def do_train(index_path, width, height):
-    data = image_data_bunch_from_data_file(index_path, path=".", size=(height, width))
+    data = image_data_bunch_from_data_file(index_path, path=".", size=(height, width), seed=10)
 
     data_metrics = defaultdict(dict)
     dataset_names = ["Training", "Validation", "Test"]
