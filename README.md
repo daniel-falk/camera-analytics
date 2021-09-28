@@ -1,16 +1,43 @@
 # Edge based camera image analytics
 
-Application for ARMv7 based network camera for door state prediction (door open / door closed) using a conv net.
+This repository aims to be an example for how to build analytics applications for *Axis* network cameras using *micropython*. *micropython* is an extremely low-footprint implementation of the *python* language. The *micropython* interpreter and dependencies can easily be packaged in an *ACAP* (*AXIS Camera Application Platform*) application. This allows for rapid prototyping and fast trial of analytics applications at real sites with no extra hardware. Code written with *micropython* as "glue" can also be easier to maintain, debug and adapt than pure C or C++ code. 
 
-Idea of project is to create an easy to train installation dependent detector to see if a door is open or closed. Training is done on host (a developer machine) while the prediction is done on edge (in the network camera).
+The base in this repository is the pipeline to cross compile *micropython* and to deploy and run it on an *ARMv7* *AXIS* camera (e.g. the *S2L* SoC). The show-case application to perform image analytics using *micropython* is not yet finished, the idea is to do installation specific door state prediction (door open / door closed) using a tiny conv net. The training is done on host (a developer machine) while the prediction should be done completely on edge (in the network camera).
 
-Applications for host written in python3.7+, applications for camera written in micropython with c-modules for acceleration where needed. Training of neural network is done in pytorch, inference (on edge) shall be done using ulab (numpy-like library for micropython) or a c-module.
+Applications for host are written in *python3.7+* while the applications for the camera are written in *micropython* with c-modules for acceleration where needed. Training of neural networks are done in *pytorch* while the inference (on edge) shall be done using *ulab* (*numpy*-like library for *micropython*) or a c-module utilizing a c inference runtime.
 
-A dockerfile for building an SDK or dev env to build c-modules for micropython is included, this handles all cross-compiling for ARMv7.
+A dockerfile for building an SDK or development environment to build the c-modules for *micropython* is included, this handles all cross-compiling for *ARMv7*.
 
 ## Development
 
-### Building micropython c modules
+### Building and depoying micropython with c modules
+
+To cross compile the *micropython* language together with the c-modules you just need to run the multistage *docker* build process to build the SDK. This can be done with the make target:
+```bash
+make build-sdk
+```
+
+To install the *micropython* language in the camera, use the make target:
+```bash
+make install-mpy
+```
+
+To run the *micropython* interpreter in the camera you can use the *make* target (or *ssh* into the camera manually):
+```bash
+make run-mpy
+```
+
+You can now try e.g. to do a fft analysis in the camera:
+
+```python
+>>> from ulab import numpy as np
+>>> 
+>>> np.fft.fft(np.array([1,2,3,4,1,2,3,4]))
+(array([20.0, 0.0, -4.0, 0.0, -4.0, 0.0, -4.0, 0.0], dtype=float64), array([0.0, 0.0, 3.999999999999999, 0.0, 0.0, 0.0, -3.999999999999999, 0.0], dtype=float64))
+```
+
+
+### Debuging cross compilation
 The c modules are built in the second stage of the multi stage docker build. If this does not work, e.g. when developing the c modules one can build a "base" image where micropython and c modules are not yet compiled. One can then start a container and mount the submodule code from host.
 ```bash
 docker build . --target=base -t camera-analytics:base
