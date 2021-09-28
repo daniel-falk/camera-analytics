@@ -48,6 +48,7 @@ COPY tools/ /tools
 # but don't build micropython itself yet..
 WORKDIR /src
 RUN git clone https://github.com/micropython/micropython.git
+RUN cd micropython && git checkout v1.17
 WORKDIR /src/micropython/mpy-cross
 RUN make
 WORKDIR /src/micropython/ports/unix
