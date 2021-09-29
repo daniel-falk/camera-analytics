@@ -30,6 +30,11 @@ make run-mpy
 You can now try e.g. to do a fft analysis in the camera:
 
 ```python
+>>> import os
+>>> os.system("uname -a")
+Linux axis-accc******** 4.9.206-axis5 #1 PREEMPT Mon Jun 7 08:54:15 UTC 2021 armv7l GNU/Linux
+0
+>>>
 >>> from ulab import numpy as np
 >>> 
 >>> np.fft.fft(np.array([1,2,3,4,1,2,3,4]))

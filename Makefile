@@ -11,5 +11,8 @@ build-sdk:
 install-mpy: build-sdk
 	tools/install-mpy.sh ${IMAGE_NAME}:${IMAGE_TAG} ${CAM}
 
-run-mpy: build-sdk
+run-host-mpy: build-sdk
 	docker run --rm -it -v `pwd`:/src/camera-analytics -w /src/camera-analytics ${IMAGE_NAME}:${IMAGE_TAG} /usr/bin/micropython
+
+run-mpy:
+	ssh -t ${CAM} LD_LIBRARY_PATH=/tmp/libs /tmp/micropython

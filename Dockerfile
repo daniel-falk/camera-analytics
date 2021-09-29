@@ -41,9 +41,6 @@ RUN apt install libffi-dev -y
 RUN apt-get install libjpeg-dev:armhf -y
 RUN apt-get install libjpeg-dev -y
 
-# Copy tools scripts
-COPY tools/ /tools
-
 # Clone micropython source and build the cross-compiler tools
 # but don't build micropython itself yet..
 WORKDIR /src
@@ -64,6 +61,7 @@ RUN rm -rf /tmp/micropython-lib
 # existing dir which can be mounted when container is used.
 # In the SDK the submodules are copied in place in a later step.
 ENV USER_C_MODULES=/c_modules/
+COPY tools/ /tools
 RUN /tools/add-c-module.sh $USER_C_MODULES /submodules/micropython-ulab/code ULAB
 RUN /tools/add-c-module.sh $USER_C_MODULES /submodules/ujpeg/src UJPEG
 
@@ -79,6 +77,13 @@ COPY submodules/ /submodules
 RUN make
 RUN cp micropython /usr/bin/
 RUN make clean
+
+# Collect installed shared libs that we need on target,
+# this makes deployment easier
+RUN mkdir /target-libs
+RUN export LIB=`find /usr/lib/arm-linux-gnueabihf/ -name "libjpeg.so*" -type f` && \
+    export SO_NAME=`objdump -p $LIB | grep SO | awk '{print $2}'` && \
+    cp $LIB /target-libs/$SO_NAME
 
 # Cross-compile micropython's unix-port
 RUN PKG_CONFIG_PATH=/usr/lib/arm-linux-gnueabihf/pkgconfig/ make deplibs CROSS_COMPILE=arm-linux-gnueabihf-
