@@ -45,7 +45,7 @@ RUN apt-get install libjpeg-dev -y
 # but don't build micropython itself yet..
 WORKDIR /src
 RUN git clone https://github.com/micropython/micropython.git
-RUN cd micropython && git checkout v1.17
+RUN cd micropython && git checkout v1.15
 WORKDIR /src/micropython/mpy-cross
 RUN make
 WORKDIR /src/micropython/ports/unix
@@ -53,7 +53,9 @@ RUN make submodules
 
 # Copy the standard micropython libs to image
 COPY submodules/micropython-lib /tmp/micropython-lib
-RUN cd /tmp/micropython-lib && make install PREFIX=/usr/lib/micropython
+RUN mkdir -p /usr/lib/micropython
+RUN cp -r /tmp/micropython-lib/micropython/* /usr/lib/micropython
+RUN cp -r /tmp/micropython-lib/python-stdlib/* /usr/lib/micropython
 RUN rm -rf /tmp/micropython-lib
 
 # Link the c-modules to build with micropython
