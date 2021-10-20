@@ -51,11 +51,13 @@ RUN make
 WORKDIR /src/micropython/ports/unix
 RUN make submodules
 
+# Copy the tools folder with helper scripts
+COPY tools/ /tools
+
 # Copy the standard micropython libs to image
-COPY submodules/micropython-lib /tmp/micropython-lib
-RUN mkdir -p /usr/lib/micropython
-RUN cp -r /tmp/micropython-lib/micropython/* /usr/lib/micropython
-RUN cp -r /tmp/micropython-lib/python-stdlib/* /usr/lib/micropython
+COPY submodules/micropython-lib/micropython /tmp/micropython-lib
+COPY submodules/micropython-lib/python-stdlib /tmp/micropython-lib
+RUN python3 /tools/install-libs.py /tmp/micropython-lib /usr/lib/micropython/
 RUN rm -rf /tmp/micropython-lib
 
 # Link the c-modules to build with micropython
@@ -63,7 +65,6 @@ RUN rm -rf /tmp/micropython-lib
 # existing dir which can be mounted when container is used.
 # In the SDK the submodules are copied in place in a later step.
 ENV USER_C_MODULES=/c_modules/
-COPY tools/ /tools
 RUN /tools/add-c-module.sh $USER_C_MODULES /submodules/micropython-ulab/code ULAB
 RUN /tools/add-c-module.sh $USER_C_MODULES /submodules/ujpeg/src UJPEG
 

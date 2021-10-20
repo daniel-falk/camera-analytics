@@ -16,4 +16,4 @@ run-host-mpy: build-sdk
 	docker run --rm -it -v `pwd`:/src/camera-analytics -w /src/camera-analytics ${IMAGE_NAME}:${IMAGE_TAG} /usr/bin/micropython
 
 run-mpy:
-	ssh -t ${CAM_USER}@${CAM} LD_LIBRARY_PATH=/tmp/libs /tmp/micropython
+	ssh -t ${CAM_USER}@${CAM} "cd /tmp/micropython-libs; LD_LIBRARY_PATH=/tmp/libs /tmp/micropython"

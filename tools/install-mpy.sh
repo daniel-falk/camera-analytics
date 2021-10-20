@@ -12,6 +12,7 @@ echo TMP_DIR $TMP_DIR
 ID=`docker create $IMAGE`
 docker cp $ID:/src/micropython/ports/unix/micropython $TMP_DIR
 docker cp $ID:/target-libs $TMP_DIR/libs
+docker cp $ID:/usr/lib/micropython $TMP_DIR/micropython-libs
 docker rm $ID
 
 # Upload to camera
