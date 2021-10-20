@@ -12,6 +12,13 @@ A dockerfile for building an SDK or development environment to build the c-modul
 
 ### Building and depoying micropython with c modules
 
+First off, clone the repo and checkout all submodules:
+```bash
+git clone https://github.com/daniel-falk/camera-analytics.git
+cd camera-analytics
+git submodule update --init
+```
+
 To cross compile the *micropython* language together with the c-modules you just need to run the multistage *docker* build process to build the SDK. This can be done with the make target:
 ```bash
 make build-sdk
