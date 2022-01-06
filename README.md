@@ -48,6 +48,13 @@ Linux axis-accc******** 4.9.206-axis5 #1 PREEMPT Mon Jun 7 08:54:15 UTC 2021 arm
 (array([20.0, 0.0, -4.0, 0.0, -4.0, 0.0, -4.0, 0.0], dtype=float64), array([0.0, 0.0, 3.999999999999999, 0.0, 0.0, 0.0, -3.999999999999999, 0.0], dtype=float64))
 ```
 
+You can read JPG images with the [ujpeg library](https://github.com/daniel-falk/ujpeg):
+```python
+>>> import ujpeg
+>>> r, g, b = ujpeg.decode("camera.jpg")
+>>> r.shape
+(270, 270)
+```
 
 ### Debuging cross compilation
 The c modules are built in the second stage of the multi stage docker build. If this does not work, e.g. when developing the c modules one can build a "base" image where micropython and c modules are not yet compiled. One can then start a container and mount the submodule code from host.
