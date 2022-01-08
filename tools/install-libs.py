@@ -30,8 +30,6 @@ IGNORE_FILES = ("setup.py",)
 def copy_lib_files(src, dst):
     for child in src.glob("*.py"):
         if child.name not in IGNORE_FILES:
-            if "mqtt" in str(src):
-                print("copy: ", child, dst)
             shutil.copy(str(child), str(dst))
 
 
