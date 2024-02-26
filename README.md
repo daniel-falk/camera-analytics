@@ -1,3 +1,8 @@
+# Outdated Repo
+This repository is mostly outdated. There has been a lot of new thins happening with Edge AI inference and the Axis ACAP SDKs since this repo was created. The repo does however contain a lot of valuable information, therefore I will leave it here as a reference.
+
+For more up to date inforation, take a look at the [AXIS Native SDK](https://github.com/AxisCommunications/acap-native-sdk-examples/) and the [AXIS Computer Vision SDK](https://github.com/AxisCommunications/acap-computer-vision-sdk-examples). You can also read my [comprehensive article on what SDK to use](https://www.linkedin.com/pulse/comprehensive-guide-axis-network-camera-edge-application-sdks/).
+
 # Edge based camera image analytics
 
 This repository aims to be an example for how to build analytics applications for *Axis* network cameras using *micropython*. *micropython* is an extremely low-footprint implementation of the *python* language. The *micropython* interpreter and dependencies can easily be packaged in an *ACAP* (*AXIS Camera Application Platform*) application. This allows for rapid prototyping and fast trial of analytics applications at real sites with no extra hardware. Code written with *micropython* as "glue" can also be easier to maintain, debug and adapt than pure C or C++ code. 
